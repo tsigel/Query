@@ -3,8 +3,11 @@ var $ = (function () {
     var pr = "prototype";
     var c = "constructor";
     var d = "document";
+    var D = document;
     var w = "window";
+    var W = window;
     var co = console;
+    var A = Array;
 
     /**
      * @class E
@@ -45,6 +48,20 @@ var $ = (function () {
         }
     };
 
+    ep.css = function (name, value) {
+        if (typeof name == "object") {
+            $.forEach(name, function (value, name) {
+                this._setCss(name, value);
+            }, this);
+            return this;
+        }
+        if (E._hasVal(value)) {
+            this._setCss(name,value);
+        } else {
+            this._getCss(name);
+        }
+    };
+
     ep.toggleClass = function (className) {
         if (this.hasClass(className)) {
             this.removeClass(className);
@@ -73,8 +90,16 @@ var $ = (function () {
         if (E._hasVal(html)) {
             this.node.innerHTML = html;
         } else {
-            return this.innerHTML;
+            return this.node.innerHTML;
         }
+    };
+
+    ep._setCss = function (name,value) {
+
+    };
+
+    ep._getCss = function (name) {
+
     };
 
     /**
@@ -85,7 +110,7 @@ var $ = (function () {
      */
     var $ = function $(param) {
         if (this instanceof $) {
-            Array[pr].forEach.call(arguments, function (arg) {
+            A[pr].forEach.call(arguments, function (arg) {
                 this.add(arg);
             }, this);
         } else {
@@ -104,7 +129,7 @@ var $ = (function () {
         };
     });
 
-    ["val", "hasClass", "html"].forEach(function (method) {
+    ["val", "html"].forEach(function (method) {
         p[method] = function (val) {
             return this._setOrGet(method, val);
         }
@@ -117,23 +142,73 @@ var $ = (function () {
     });
 
     p.add = function (param) {
-        if (Array.isArray(param)) {
+        if (A.isArray(param)) {
             param.forEach(this.add, this);
         } else {
-            var elem = this._toElem(param);
-            if (elem)
-                this.push(elem);
+            this._toElem(param).forEach(function (el) {
+                this.push(el);
+            }, this);
         }
+    };
+
+    p.hasClass = function (className) {
+        if (!this._has()) return false;
+        return this[0].hasClass(className);
     };
 
     p.find = function (selector) {
         if (!this._has()) return this;
-        return new $(Array[pr].slice.call(this[0].node.querySelectorAll(selector)));
+        return new $(A[pr].slice.call(this[0].node.querySelectorAll(selector)));
+    };
+
+    p.clone = function () {
+        if (!this._has()) return this;
+        return new $(this[0].node.cloneNode(true));
+    };
+
+    p.show = function () {
+        if (!this._has()) return this;
+        this._toAll("css", ["display", "block"]);
+    };
+
+    p.hide = function () {
+        if (!this._has()) return this;
+        this._toAll("css", ["display", "none"]);
+    };
+
+    p.css = function (name, value) {
+        if (typeof name == "object") {
+            return this._toAll("css", [name]);
+        } else {
+            if (E._hasVal(value)) {
+                return this._toAll("css", [name, value]);
+            } else {
+                return this[0].css(name);
+            }
+        }
+    };
+
+    p.toggleDisplay = function () {
+        if (!this._has()) return this;
+        this.each(function () {
+            if (this.css("display") == "none") {
+                this.show();
+            } else {
+                this.hide();
+            }
+        });
+    };
+
+    p.each = function (callback) {
+        this.forEach(function (el, index) {
+            callback.call(this.eq(index), el.node, index);
+        }, this);
+        return this;
     };
 
     p.children = function () {
         if (!this._has()) return this;
-        return new $(Array[pr].slice.call(this[0].node.childNodes));
+        return new $(A[pr].slice.call(this[0].node.childNodes));
     };
 
     p.eq = function (index) {
@@ -153,20 +228,49 @@ var $ = (function () {
 
     p.append = function (param) {
         if (!this._has()) return this;
-        var elem = this._toElem(param);
-        if (elem)
+        this._toElem(param, true).forEach(function (elem) {
             this[0].node.appendChild(elem.node);
+        }, this);
     };
 
-    p._toElem = function (param) {
+    p.prepend = function (param) {
+        if (!this._has()) return this;
+        this._toElem(param, true).forEach(function (elem) {
+            var childs = A[pr].filter.call(this[0].node.childNodes, function (el) {
+                return $.isElement(el)
+            });
+            if (childs.length) {
+                this[0].node.insertBefore(elem.node, childs[0]);
+            } else {
+                this[0].node.appendChild(elem.node);
+            }
+        }, this);
+    };
+
+    p._toElem = function (param, notSelector) {
         if ($.isElement(param)) {
-            return new E(param);
+            return [new E(param)];
         } else if (param instanceof E) {
-            return param;
+            return [param];
+        } else if (param instanceof $) {
+            return [param[0]];
         } else if (typeof param == "string") {
-            console.log("string");
+            if (/<.+?>/.test(param)) {
+                return $.parse(param).map(function (el) {
+                    return new E(el)
+                });
+            } else {
+                if (notSelector) {
+                    return [param];
+                } else {
+                    return A[pr].slice.call(D.querySelectorAll(param)).map(function (el) {
+                        return new E(el)
+                    });
+                }
+            }
         } else {
             co.log("wrong param!", param);
+            return [];
         }
     };
 
@@ -174,6 +278,7 @@ var $ = (function () {
         this.forEach(function (elem) {
             elem[method].apply(elem, args);
         });
+        return this;
     };
 
     p._has = function () {
@@ -192,8 +297,16 @@ var $ = (function () {
             this._toAll(method, args);
             return this;
         } else {
-            return this[0][method]();
+            return this[0][method](arg);
         }
+    };
+
+    $.parse = function (html) {
+        var div = D.createElement("div");
+        div.innerHTML = html;
+        return A[pr].filter.call(div.childNodes, function (elem) {
+            return $.isElement(elem);
+        });
     };
 
     /**
@@ -218,15 +331,14 @@ var $ = (function () {
      * @param {string} text
      * @returns {string}
      */
-    $.trim = (function (text) {
-        if ("trim" in String.prototype) {
+    $.trim = (function () {
+        if ("trim" in String[pr]) {
             return function (text) {
                 return text.trim();
             }
-        } else {
-            return function (text) {
-                return (text || "").replace(/^\s+|\s+$/g, "");
-            }
+        }
+        return function (text) {
+            return (text || "").replace(/^\s+|\s+$/g, "");
         }
     })();
 
@@ -262,7 +374,7 @@ var $ = (function () {
      * @param {*} [context]
      */
     $.forEach = function (some, callback, context) {
-        if (Array.isArray(some)) {
+        if (A.isArray(some)) {
             some.forEach(callback, context);
         } else {
             Object.keys(some).forEach(function (name) {
@@ -279,7 +391,7 @@ var $ = (function () {
      * @returns {boolean}
      */
     $.some = function (some, callback, context, argument) {
-        if (Array.isArray(some)) {
+        if (A.isArray(some)) {
             return some.some(function (value, index) {
                 return callback.call(context || window, value, index, argument);
             });
