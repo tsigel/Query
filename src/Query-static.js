@@ -86,6 +86,22 @@ var $ = (function () {
         this.node.removeAttribute(name);
     };
 
+    ep.width = function (width) {
+        if (E._hasVal(width)) {
+            this._setCss("width", typeof width == "number" ? width + "px" : width);
+        } else {
+            return this.node.clientWidth || parseInt(this._getCss("width")) || 0;
+        }
+    };
+
+    ep.height = function (height) {
+        if (E._hasVal(height)) {
+            this._setCss("height", typeof height == "number" ? height + "px" : height);
+        } else {
+            return this.node.clientHeight || parseInt(this._getCss("height")) || 0;
+        }
+    };
+
     ep.html = function (html) {
         if (E._hasVal(html)) {
             this.node.innerHTML = html;
@@ -438,6 +454,10 @@ var $ = (function () {
         });
 
         return result;
+    };
+
+    $.addPlugin = function (callback) {
+        callback($, E);
     };
 
     $.events = {};
