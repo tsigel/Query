@@ -14,7 +14,8 @@ module.exports = function(config) {
 
         // list of files / patterns to load in the browser
         files: [
-            "src/Query-static.js",
+            //"src/*.js",
+            "build/*.js",
             "test/query.test.js"
         ],
 
@@ -55,7 +56,7 @@ module.exports = function(config) {
         // - Safari (only Mac)
         // - PhantomJS
         // - IE (only Windows)
-        browsers: ['Chrome'],
+        browsers: ['Chrome', "Safari", "Opera", "Firefox"],
 
 
         // If browser does not capture in given timeout [ms], kill it

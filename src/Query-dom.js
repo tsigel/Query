@@ -56,9 +56,9 @@ var $ = (function () {
             return this;
         }
         if (E._hasVal(value)) {
-            this._setCss(name,value);
+            this._setCss(name, value);
         } else {
-            this._getCss(name);
+            return this._getCss(name);
         }
     };
 
@@ -110,13 +110,82 @@ var $ = (function () {
         }
     };
 
-    ep._setCss = function (name,value) {
+    ep._setCss = function (name, value) {
+        var $name;
+        name = $.camelCase(name);
+        if (!name in E.test.style) {
+            if (!E._activePrefix) {
+                if (!E._prefexes.some(function (prefix) {
+                        var $name = $.camelCase(prefix + name);
+                        if ($name in E.test.style) {
+                            E._activePrefix = prefix;
+                            name = $name;
+                            return true;
+                        }
+                    })) {
+                    co.warn("Не удалось найти префикс!", name, value);
+                }
+            } else {
+                $name = $.camelCase(E._activePrefix + name);
+                if ($name in E.test.style) {
+                    name = $name;
+                } else {
+                    co.warn("Не корректный стиль!", name, value);
+                }
+            }
+        }
 
+        this.node.style[name] = value;
     };
 
     ep._getCss = function (name) {
 
+        name = $.camelCase(name);
+        var styles = [this.node.style, getComputedStyle(this.node)];
+        var result = styles[0][name] || styles[1][name] || "";
+
+        var check = function (name, callback) {
+            return styles.some(function (style) {
+                var $name = $.camelCase(name);
+                if ($name in style) {
+                    result = style[$name];
+                    callback ? callback() : false;
+                    return true;
+                }
+            });
+        };
+
+        if (!result) {
+            if (E._activePrefix) {
+                if (!check(E._activePrefix + name)) {
+                    co.warn("Не удалось получить стиль!", name);
+                }
+            } else {
+                if (!E._prefexes.some(function (prefix) {
+                        return check(prefix + name, function () {
+                                E._activePrefix = prefix;
+                            });
+                    })) {
+                    co.warn("Не удалось получить стиль и префикс!", name);
+                }
+            }
+        }
+        return result;
     };
+
+    E._activePrefix = "";
+
+    E._prefexes = [
+        "-moz-",
+        "-ms-",
+        "-webkit-",
+        "-o-"
+    ];
+
+    /**
+     * @type {HTMLElement}
+     */
+    E.test = D.createElement("DIV");
 
     /**
      * @class $
@@ -145,7 +214,7 @@ var $ = (function () {
         };
     });
 
-    ["val", "html"].forEach(function (method) {
+    ["val", "html", "width", "height"].forEach(function (method) {
         p[method] = function (val) {
             return this._setOrGet(method, val);
         }
@@ -363,9 +432,9 @@ var $ = (function () {
      * @returns {string}
      */
     $.camelCase = function (text) {
-        return text.toLowerCase().replace(/-(.)/g, function (match, group1) {
-            return group1.toUpperCase();
-        });
+        return text.split(/[^\d\w]/).map(function (str, index) {
+            return index ? str.charAt(0).toUpperCase() + str.substr(1) : str;
+        }).join("");
     };
 
     /**
@@ -511,6 +580,17 @@ var $ = (function () {
         } else {
             $.events = events.mouse;
         }
+    })();
+
+    window["requestAnimationFrame"] = (function () {
+        return window.requestAnimationFrame ||
+            window["webkitRequestAnimationFrame"] ||
+            window["mozRequestAnimationFrame"] ||
+            window["oRequestAnimationFrame"] ||
+            window["msRequestAnimationFrame"] ||
+            function (callback) {
+                window.setTimeout(callback, 1000 / 60);
+            };
     })();
 
     return $;

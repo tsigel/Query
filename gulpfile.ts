@@ -7,8 +7,10 @@ import uglify = require("gulp-uglify");
 
 gulp.task("min", function () {
 
-    gulp.src("src/Query-static.js")
+    gulp.src("src/*.js")
         .pipe(uglify())
-        .pipe(gulp.dest("./build/"));
+        .pipe(gulp.dest("./build"));
 
 });
+
+gulp.task("default", ["min"]);

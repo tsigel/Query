@@ -2,12 +2,22 @@ describe("query test", function () {
 
     var createElem = function (tagName, className, parent) {
         var elem = document.createElement(tagName);
-        elem.className = className;
+        elem.className = className || "";
         if (parent) {
             parent.appendChild(elem);
         }
         return elem;
     };
+
+    if (!("remove" in Element.prototype)) {
+        Element.prototype.remove = function () {
+            if (this.parentNode) {
+                this.parentNode.removeChild(this);
+            } else {
+                console.warn("Нет родителя!");
+            }
+        }
+    }
 
     describe("constructor", function () {
 
@@ -124,6 +134,15 @@ describe("query test", function () {
 
     });
 
+    it("removeAttr", function () {
+
+        var div = createElem("div");
+        div.setAttribute("test", " ");
+        $(div).removeAttr("test");
+        expect(div.getAttribute("test")).to.be(null);
+
+    });
+
     it("html", function () {
 
         var div = createElem("div", "test", document.body);
@@ -153,6 +172,104 @@ describe("query test", function () {
         input.remove();
 
     });
+
+    it("hide show toggle", function () {
+
+        var div = createElem("div");
+        $(div).hide();
+        expect(div.style.display).to.be("none");
+        $(div).show();
+        expect(div.style.display).to.be("block");
+        $(div).toggleDisplay();
+        expect(div.style.display).to.be("none");
+        $(div).toggleDisplay();
+        expect(div.style.display).to.be("block");
+
+    });
+
+    it("requestAnimationFrame", function () {
+
+        requestAnimationFrame(function () {
+            expect(true).to.be(true);
+        });
+
+    }, 100);
+
+    it("css transform", function () {
+
+        var names = ["transform-origin", "TransformOrigin", "transformOrigin"];
+        var prefexes = [
+            "",
+            "-moz-",
+            "-ms-",
+            "-webkit-",
+            "-o-",
+            "Moz",
+            "Ms",
+            "Webkit",
+            "O",
+            "moz",
+            "ms",
+            "webkit"
+        ];
+
+        var value = "50% 50%";
+
+        var div = createElem("div");
+        $(div).css("transform-origin", value);
+        var ok = false;
+
+        if (names.some(function (name) {
+                if (name in div.style && div.style[name].indexOf(value) == 0) {
+                    return true;
+                } else {
+                    return prefexes.some(function (prefix) {
+                        return (((prefix + name) in div.style) && div.style[prefix + name].indexOf(value) == 0);
+                    });
+                }
+            })) {
+            ok = true;
+        }
+        expect(ok).to.be(true);
+        expect($(div).css("transform-origin").indexOf(value)).to.be(0);
+
+    });
+
+    it("width", function () {
+
+        var div = createElem("div", "width");
+        var $div = $(div);
+        div.style.width = "10px";
+        expect($div.width()).to.be(10);
+        $div.width(15);
+        expect(div.style.width).to.be("15px");
+        div.removeAttribute("style");
+        var style = createElem("style");
+        
+        requestAnimationFrame(function () {
+            style.innerHTML = ".width {width: 100px}";
+            expect($div.width()).to.be(100);
+        });
+
+    }, 100);
+
+    it("height", function () {
+
+        var div = createElem("div", "height");
+        var $div = $(div);
+        div.style.height = "10px";
+        expect($div.height()).to.be(10);
+        $div.height(15);
+        expect(div.style.height).to.be("15px");
+        div.removeAttribute("style");
+        var style = createElem("style");
+
+        requestAnimationFrame(function () {
+            style.innerHTML = ".height {height: 100px}";
+            expect($div.height()).to.be(100);
+        });
+
+    }, 100);
 
     describe("classes", function () {
 
