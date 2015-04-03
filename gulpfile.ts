@@ -25,25 +25,36 @@ gulp.task("min", function () {
 
 gulp.task("make", function () {
 
+    var concat = function (fileName, paths) {
+        paths.unshift("build/Query-dom.js");
+        var get = function () {
+            return paths.map(function (name) {
+                return fs.readFileSync(name, "utf8");
+            }).join("\n")
+        };
+        fs.writeFileSync(fileName, get());
+    };
+
     fs.mkdirSync("build");
     fs.copySync("src/Query-dom.js", "build/Query-dom.js");
     fs.copySync("src/Query-events.js", "build/Query-events.js");
+    fs.copySync("src/Query-css.js", "build/Query-css.js");
 
     fs.writeFileSync("build/Query-events.js", fs.readFileSync("build/Query-events.js", "utf8")
         .replace(/\/\/\/IMPORT:src\/events\/(.+)/g, function (match, group) {
             var text = fs.readFileSync("src/events/" + group, "utf8");
             text = text.substr(text.indexOf("///---") + 6);
-            return text.replace(/\n/g, "\n    ").replace("--", "");
+            return text.replace(/\n/g, "\n      ").replace("--", "");
         }));
 
-    fs.writeFileSync("build/Query.js", getAll());
+    fs.writeFileSync("build/Query-css.js", fs.readFileSync("build/Query-css.js", "utf8")
+        .replace(/\/\/\/IMPORT:src\/(.+)/g, function (match, group) {
+            return fs.readFileSync("src/" + group, "utf8").replace(/\n/g, "\n      ");
+        }));
 
-    function getAll() {
-        var files = ["build/Query-dom.js", "build/Query-events.js"];
-        return files.map(function (name) {
-            return fs.readFileSync(name, "utf8");
-        }).join("\n");
-    }
+    concat("build/Query.js", ["build/Query-events.js", "build/Query-css.js"]);
+    concat("build/Query-events.js", ["build/Query-events.js"]);
+    concat("build/Query-css.js", ["build/Query-css.js"]);
 });
 
 gulp.task("default", ["remove", "make", "min"]);

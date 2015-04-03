@@ -556,7 +556,7 @@ var $ = (function (W, D) {
      * Задаем или получаем данные для элементов коллекции
      * @param method
      * @param argToCheck
-     * @param arg
+     * @param [arg]
      * @returns {*}
      * @private
      */
