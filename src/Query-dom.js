@@ -1,13 +1,12 @@
-var $ = (function () {
+var $ = (function (W, D) {
+    "use strict";
 
-    var pr = "prototype";
-    var c = "constructor";
-    var d = "document";
-    var D = document;
-    var w = "window";
-    var W = window;
-    var co = console;
-    var A = Array;
+    var pr = "prototype",
+        c = "constructor",
+        d = "document",
+        w = "window",
+        co = console,
+        A = Array;
 
     /**
      * @class E
@@ -15,39 +14,59 @@ var $ = (function () {
      * @constructor
      */
     var E = function (node) {
-        this.node = node;
+        this._node = node;
     };
 
-    E._hasVal = function (val) {
-        return val != undefined;
-    };
-
+    /**
+     * Ссылка на прототип для быстрой и компактной записи (профит при обфусцировании)
+     * @type {Object}
+     */
     var ep = E.prototype;
 
+    /**
+     * Получаем или ставим атрибут
+     * @param {string} name
+     * @param {string} [value]
+     * @returns {string|null}
+     */
     ep.attr = function (name, value) {
         if (E._hasVal(value)) {
-            this.node.setAttribute(name, value);
+            this._node.setAttribute(name, value);
         } else {
-            return this.node.getAttribute(name) || "";
+            return this._node.getAttribute(name) || "";
         }
     };
 
+    /**
+     * Добавляем класс
+     * @param {string} className
+     */
     ep.addClass = function (className) {
         if (!this.hasClass(className)) {
-            var classList = this.node.className.split(" ");
+            var classList = this._node.className.split(" ");
             classList.push(className);
-            this.node.className = $.trim(classList.join(" "));
+            this._node.className = $.trim(classList.join(" "));
         }
     };
 
+    /**
+     * Убираем класс
+     * @param {string} className
+     */
     ep.removeClass = function (className) {
         if (this.hasClass(className)) {
-            var classList = this.node.className.split(" ");
+            var classList = this._node.className.split(" ");
             classList.splice(classList.indexOf(className), 1);
-            this.node.className = $.trim(classList.join(" "));
+            this._node.className = $.trim(classList.join(" "));
         }
     };
 
+    /**
+     * Добавляем/получаем стили элемента
+     * @param {string|Object} name
+     * @param [value]
+     * @returns {string|null}
+     */
     ep.css = function (name, value) {
         if (typeof name == "object") {
             $.forEach(name, function (value, name) {
@@ -62,6 +81,10 @@ var $ = (function () {
         }
     };
 
+    /**
+     * Добавляем/убираем класс
+     * @param {string} className
+     */
     ep.toggleClass = function (className) {
         if (this.hasClass(className)) {
             this.removeClass(className);
@@ -70,46 +93,81 @@ var $ = (function () {
         }
     };
 
+    /**
+     * Добавляем/получаем value элемента
+     * @param {string} [value]
+     * @returns {string|string}
+     */
     ep.val = function (value) {
         if (E._hasVal(value)) {
-            this.node.value = value;
+            this._node.value = value;
         } else {
-            return this.node.value || "";
+            return this._node.value || "";
         }
     };
 
+    /**
+     * Проверяем наличие класса
+     * @param {string} className
+     * @returns {boolean}
+     */
     ep.hasClass = function (className) {
-        return (this.node.className.split(" ").indexOf(className) != -1);
+        return (this._node.className.split(" ").indexOf(className) != -1);
     };
 
+    /**
+     * Удаляем атрибут
+     * @param {string} name
+     */
     ep.removeAttr = function (name) {
-        this.node.removeAttribute(name);
+        this._node.removeAttribute(name);
     };
 
+    /**
+     * Добавляем/получаем ширину
+     * @param {string|number} [width]
+     * @returns {number}
+     */
     ep.width = function (width) {
         if (E._hasVal(width)) {
             this._setCss("width", typeof width == "number" ? width + "px" : width);
         } else {
-            return this.node.clientWidth || parseInt(this._getCss("width")) || 0;
+            return this._node.clientWidth || parseInt(this._getCss("width")) || 0;
         }
     };
 
+    /**
+     * Добавляем/получаем высоту
+     * @param {string|number} [height]
+     * @returns {number}
+     */
     ep.height = function (height) {
         if (E._hasVal(height)) {
             this._setCss("height", typeof height == "number" ? height + "px" : height);
         } else {
-            return this.node.clientHeight || parseInt(this._getCss("height")) || 0;
+            return this._node.clientHeight || parseInt(this._getCss("height")) || 0;
         }
     };
 
+    /**
+     * Добавляем/получаем содержимое элемента
+     * @param {string} [html]
+     * @returns {string}
+     */
     ep.html = function (html) {
         if (E._hasVal(html)) {
-            this.node.innerHTML = html;
+            this._node.innerHTML = html;
         } else {
-            return this.node.innerHTML;
+            return this._node.innerHTML;
         }
     };
 
+    /**
+     * Устанавливаем стиль элемента
+     * @param {string} name
+     * @param {string} value
+     * @private
+     */
     ep._setCss = function (name, value) {
         var $name;
         name = $.camelCase(name);
@@ -135,13 +193,19 @@ var $ = (function () {
             }
         }
 
-        this.node.style[name] = value;
+        this._node.style[name] = value;
     };
 
+    /**
+     * Получаем стиль
+     * @param {string} name
+     * @returns {string}
+     * @private
+     */
     ep._getCss = function (name) {
 
         name = $.camelCase(name);
-        var styles = [this.node.style, getComputedStyle(this.node)];
+        var styles = [this._node.style, getComputedStyle(this._node)];
         var result = styles[0][name] || styles[1][name] || "";
 
         var check = function (name, callback) {
@@ -163,8 +227,8 @@ var $ = (function () {
             } else {
                 if (!E._prefexes.some(function (prefix) {
                         return check(prefix + name, function () {
-                                E._activePrefix = prefix;
-                            });
+                            E._activePrefix = prefix;
+                        });
                     })) {
                     co.warn("Не удалось получить стиль и префикс!", name);
                 }
@@ -173,8 +237,32 @@ var $ = (function () {
         return result;
     };
 
+    /**
+     * Проверяет наличие значения
+     * @param val
+     * @returns {boolean}
+     * @private
+     */
+    E._hasVal = function (val) {
+        return val != undefined;
+    };
+
+    E._createE = function (node) {
+        return new E(node);
+    };
+
+    /**
+     * Активный префикс
+     * @type {string}
+     * @private
+     */
     E._activePrefix = "";
 
+    /**
+     * Массив префиксов браузеров
+     * @type {string[]}
+     * @private
+     */
     E._prefexes = [
         "-moz-",
         "-ms-",
@@ -226,6 +314,11 @@ var $ = (function () {
         }
     });
 
+    /**
+     * Добавляем элементы
+     * @param param
+     * @return $
+     */
     p.add = function (param) {
         if (A.isArray(param)) {
             param.forEach(this.add, this);
@@ -234,33 +327,62 @@ var $ = (function () {
                 this.push(el);
             }, this);
         }
+        return this;
     };
 
+    /**
+     * Проверяет наличие класса у первого элемента коллекции
+     * @param {string} className
+     * @returns {boolean}
+     */
     p.hasClass = function (className) {
         if (!this._has()) return false;
         return this[0].hasClass(className);
     };
 
+    /**
+     * Ищем элементы в первом элементе коллекции
+     * @param selector
+     * @returns {$}
+     */
     p.find = function (selector) {
         if (!this._has()) return this;
-        return new $(A[pr].slice.call(this[0].node.querySelectorAll(selector)));
+        return new $(A[pr].slice.call(this[0]._node.querySelectorAll(selector)));
     };
 
+    /**
+     * Получаем копию ноды первого элемента коллекции
+     * @returns {$}
+     */
     p.clone = function () {
         if (!this._has()) return this;
-        return new $(this[0].node.cloneNode(true));
+        return new $(this[0]._node.cloneNode(true));
     };
 
+    /**
+     * Показываем все элементы коллекции
+     * @returns {$}
+     */
     p.show = function () {
         if (!this._has()) return this;
         this._toAll("css", ["display", "block"]);
     };
 
+    /**
+     * Скрываем все элементы коллекции
+     * @returns {$}
+     */
     p.hide = function () {
         if (!this._has()) return this;
         this._toAll("css", ["display", "none"]);
     };
 
+    /**
+     * Применяем стили всем элементам коллекции или получаем стиль первого
+     * @param {string|Object} name
+     * @param {string} [value]
+     * @returns {string|$}
+     */
     p.css = function (name, value) {
         if (typeof name == "object") {
             return this._toAll("css", [name]);
@@ -273,6 +395,10 @@ var $ = (function () {
         }
     };
 
+    /**
+     * Скрывает или показывает все элементы коллекции
+     * @returns {$}
+     */
     p.toggleDisplay = function () {
         if (!this._has()) return this;
         this.each(function () {
@@ -284,57 +410,96 @@ var $ = (function () {
         });
     };
 
+    /**
+     * Перебираем все элементы коллекции
+     * @param callback
+     * @returns {$}
+     */
     p.each = function (callback) {
         this.forEach(function (el, index) {
-            callback.call(this.eq(index), el.node, index);
+            callback.call(this.eq(index), el._node, index);
         }, this);
         return this;
     };
 
+    /**
+     * Получаем коллекцию элементов дочерних первому элементу коллекции
+     * @returns {$}
+     */
     p.children = function () {
         if (!this._has()) return this;
-        return new $(A[pr].slice.call(this[0].node.childNodes));
+        return new $(A[pr].slice.call(this[0]._node.childNodes));
     };
 
+    /**
+     * Получаем новую коллекцию с элементом по номеру
+     * @param index
+     * @returns {$}
+     */
     p.eq = function (index) {
         if (!this._has()) return this;
         return new $(this[index || 0]);
     };
 
+    /**
+     * Получаем ДОМ элемент из коллекции по номеру
+     * @param index
+     * @returns {HTMLElement|null}
+     */
     p.get = function (index) {
         if (!this._has()) return null;
-        return this[index || 0].node;
+        return this[index || 0]._node;
     };
 
+    /**
+     * Получаем коллекцию из родительского элемента
+     */
     p.parent = function () {
         if (!this._has()) return this;
-        return new $(this[0].node.parentNode);
+        return new $(this[0]._node.parentNode);
     };
 
+    /**
+     * Добавляем в конец набора элементов
+     * @param param
+     * @returns {$}
+     */
     p.append = function (param) {
         if (!this._has()) return this;
         this._toElem(param, true).forEach(function (elem) {
-            this[0].node.appendChild(elem.node);
+            this[0]._node.appendChild(elem._node);
         }, this);
     };
 
+    /**
+     * Добавляем в начало набора элементов
+     * @param param
+     * @returns {$}
+     */
     p.prepend = function (param) {
         if (!this._has()) return this;
         this._toElem(param, true).forEach(function (elem) {
-            var childs = A[pr].filter.call(this[0].node.childNodes, function (el) {
+            var childs = A[pr].filter.call(this[0]._node.childNodes, function (el) {
                 return $.isElement(el)
             });
             if (childs.length) {
-                this[0].node.insertBefore(elem.node, childs[0]);
+                this[0]._node.insertBefore(elem._node, childs[0]);
             } else {
-                this[0].node.appendChild(elem.node);
+                this[0]._node.appendChild(elem._node);
             }
         }, this);
     };
 
+    /**
+     * Приводим элементы к 1 типу
+     * @param param
+     * @param notSelector
+     * @returns {*}
+     * @private
+     */
     p._toElem = function (param, notSelector) {
         if ($.isElement(param)) {
-            return [new E(param)];
+            return [E._createE(param)];
         } else if (param instanceof E) {
             return [param];
         } else if (param instanceof $) {
@@ -342,14 +507,14 @@ var $ = (function () {
         } else if (typeof param == "string") {
             if (/<.+?>/.test(param)) {
                 return $.parse(param).map(function (el) {
-                    return new E(el)
+                    return E._createE(el)
                 });
             } else {
                 if (notSelector) {
-                    return [param];
+                    return [{_node: document.createTextNode(param)}];
                 } else {
                     return A[pr].slice.call(D.querySelectorAll(param)).map(function (el) {
-                        return new E(el)
+                        return E._createE(el)
                     });
                 }
             }
@@ -359,6 +524,13 @@ var $ = (function () {
         }
     };
 
+    /**
+     * Выполняем для всех элементов коллекции
+     * @param method
+     * @param args
+     * @returns {$}
+     * @private
+     */
     p._toAll = function (method, args) {
         this.forEach(function (elem) {
             elem[method].apply(elem, args);
@@ -366,6 +538,11 @@ var $ = (function () {
         return this;
     };
 
+    /**
+     * Проверяем есть ли элементы в коллекции
+     * @returns {boolean}
+     * @private
+     */
     p._has = function () {
         if (!this.length) {
             co.warn("not length!");
@@ -375,6 +552,14 @@ var $ = (function () {
         }
     };
 
+    /**
+     * Задаем или получаем данные для элементов коллекции
+     * @param method
+     * @param argToCheck
+     * @param arg
+     * @returns {*}
+     * @private
+     */
     p._setOrGet = function (method, argToCheck, arg) {
         if (!this._has()) return this;
         if (E._hasVal(argToCheck)) {
@@ -386,6 +571,11 @@ var $ = (function () {
         }
     };
 
+    /**
+     * Парсим строку превращая её в ДОМ
+     * @param html
+     * @returns {Array}
+     */
     $.parse = function (html) {
         var div = D.createElement("div");
         div.innerHTML = html;
@@ -457,13 +647,16 @@ var $ = (function () {
      * @param {Object|Array} some
      * @param {function} callback
      * @param {*} [context]
+     * @param {*} [argument]
      */
-    $.forEach = function (some, callback, context) {
+    $.forEach = function (some, callback, context, argument) {
         if (A.isArray(some)) {
-            some.forEach(callback, context);
+            some.forEach(function (value, id) {
+                callback.call(context || this, value, id, argument);
+            });
         } else {
             Object.keys(some).forEach(function (name) {
-                callback.call(context || window, some[name], name);
+                callback.call(context || this, some[name], name, argument);
             });
         }
     };
@@ -478,11 +671,11 @@ var $ = (function () {
     $.some = function (some, callback, context, argument) {
         if (A.isArray(some)) {
             return some.some(function (value, index) {
-                return callback.call(context || window, value, index, argument);
+                return callback.call(context || this, value, index, argument);
             });
         } else {
             return Object.keys(some).some(function (name) {
-                return callback.call(context || window, some[name], name, argument);
+                return callback.call(context || this, some[name], name, argument);
             });
         }
     };
@@ -495,7 +688,9 @@ var $ = (function () {
      * @returns {boolean}
      */
     $.every = function (some, callback, context, argument) {
-        return !$.some(some, callback, context, argument);
+        return !$.some(some, function (value, name) {
+            return !callback.call(context || this, value, name, argument);
+        });
     };
 
     /**
@@ -531,6 +726,8 @@ var $ = (function () {
 
     $.events = {};
 
+    $.isPointer = false;
+
     function s4() {
         return Math.floor((1 + Math.random()) * 0x10000)
             .toString(16)
@@ -562,19 +759,13 @@ var $ = (function () {
             start: "MSPointerDown",
             move: "MSPointerMove",
             end: "MSPointerUp"
-        },
-        winTouch: {
-            start: "pointerdown",
-            move: "pointermove",
-            end: "pointerup"
         }
     };
 
     (function () {
-        if ("PointerEvent" in window) {
-            $.events = events.winTouch;
-        } else if (window.navigator.msPointerEnabled) {
+        if (window.navigator.msPointerEnabled) {
             $.events = events.win;
+            $.isPointer = true;
         } else if (getEventSupport("touchmove")) {
             $.events = events.mobile;
         } else {
@@ -594,4 +785,4 @@ var $ = (function () {
     })();
 
     return $;
-})();
+})(window["$window"] || window, window["$document"] || document);

@@ -1,4 +1,4 @@
-describe("query test", function () {
+describe("query dom", function () {
 
     var createElem = function (tagName, className, parent) {
         var elem = document.createElement(tagName);
@@ -243,15 +243,40 @@ describe("query test", function () {
         expect($div.width()).to.be(10);
         $div.width(15);
         expect(div.style.width).to.be("15px");
-        div.removeAttribute("style");
-        var style = createElem("style");
-        
-        requestAnimationFrame(function () {
-            style.innerHTML = ".width {width: 100px}";
-            expect($div.width()).to.be(100);
-        });
 
     }, 100);
+
+    it("style width Async", function (done) {
+
+        var div = createElem("div", "width", document.body);
+        var $div = $(div);
+        div.removeAttribute("style");
+        var style = createElem("style");
+        style.innerHTML = ".width {width: 100px}";
+        document.head.appendChild(style);
+        setTimeout(function () {
+            expect($div.width()).to.be(100);
+            done();
+            div.remove();
+        }, 200);
+
+    }, 300);
+
+    it("style height Async", function (done) {
+
+        var div = createElem("div", "height", document.body);
+        var $div = $(div);
+        div.removeAttribute("style");
+        var style = createElem("style");
+        style.innerHTML = ".height {height: 100px}";
+        document.head.appendChild(style);
+        setTimeout(function () {
+            expect($div.height()).to.be(100);
+            done();
+            div.remove();
+        }, 200);
+
+    }, 300);
 
     it("height", function () {
 
@@ -261,13 +286,6 @@ describe("query test", function () {
         expect($div.height()).to.be(10);
         $div.height(15);
         expect(div.style.height).to.be("15px");
-        div.removeAttribute("style");
-        var style = createElem("style");
-
-        requestAnimationFrame(function () {
-            style.innerHTML = ".height {height: 100px}";
-            expect($div.height()).to.be(100);
-        });
 
     }, 100);
 
@@ -303,6 +321,179 @@ describe("query test", function () {
         });
 
         div.remove();
+
+    });
+
+    describe("$ static", function () {
+
+        it("parse", function () {
+
+            var template = "<div class='test'></div>";
+            var className = "test";
+            var tagName = "DIV";
+            var parsed = $.parse(template);
+            expect(parsed.length).to.be(1);
+            expect(parsed[0].className).to.be(className);
+            expect(parsed[0].tagName).to.be(tagName);
+
+        });
+
+        it("random", function () {
+
+            var someNum = $.random(0, 100);
+            expect(typeof someNum).to.be("number");
+            expect(isNaN(someNum)).to.be(false);
+            expect(someNum > 0 && someNum < 100).to.be(true);
+            console.log(someNum);
+
+        });
+
+        it("randomInt", function () {
+
+            var someNum = $.randomInt(0, 100);
+            console.log(someNum);
+            expect(typeof someNum).to.be("number");
+            expect(isNaN(someNum)).to.be(false);
+            expect(someNum >= 0 && someNum <= 100).to.be(true);
+            expect(Math.round(someNum)).to.be(someNum);
+
+        });
+
+        it("trim", function () {
+
+            var toTest = [" some", "    some", "some ", "some    ", "   some   ", " some "];
+
+            expect(toTest.map($.trim).every(function (text) {
+                return text == "some";
+            })).to.be(true);
+
+        });
+
+        it("camelCase", function () {
+
+            var toTest = ["some", "some name", "some-name", "-prefix-some-style-name"];
+            var result = ["some", "someName", "someName", "PrefixSomeStyleName"];
+
+            expect(toTest.map($.camelCase).every(function (text, index) {
+                return text == result[index];
+            })).to.be(true);
+
+        });
+
+        it("guid", function () {
+
+            var ok = $.guuid() != $.guuid();
+            expect(ok).to.be(true);
+
+        });
+
+        it("isElement", function () {
+
+            var toTest = [
+                "DIV", "SPAN", "IMG", "I", "B", "table", "TR", "TD", "THEAD", "TBODY", "INPUT",
+                "TEXTAREA", "CANVAS", "SVG", "A", "BUTTON", "SCRIPT", "LINK", "BODY", "HTML"
+            ];
+
+            expect(toTest.map(function (tagName) {
+                return document.createElement(tagName);
+            }).every($.isElement)).to.be(true);
+
+        });
+
+        it("forEach", function () {
+
+            var toTestObj = {
+                "some1": "value1",
+                "some2": "value2"
+            };
+
+            var toTestArr = ["value1", "value2"];
+
+            var check = {
+                "some1": false,
+                "some2": false,
+                "value1": false,
+                "value2": false
+            };
+
+            $.forEach(toTestObj, function (value, name, argument) {
+                if (this == toTestObj && argument == 1 && value == toTestObj[name]) check[name] = true;
+            }, toTestObj, 1);
+
+            $.forEach(toTestArr, function (value, name, argument) {
+                if (this == toTestArr && argument == 1 && toTestArr[name] == value) check[value] = true;
+            }, toTestArr, 1);
+
+            for (var key in check) {
+                if (check.hasOwnProperty(key)) {
+                    expect(check[key]).to.be(true);
+                }
+            }
+
+        });
+
+        it("some", function () {
+
+            var toTestArr = [1, 2, "fsa", "ok", "dfs", {}];
+            var toTestObj = {
+                0: 1,
+                "fdsa": 2,
+                "fdsaf": "ok",
+                "fads": {}
+            };
+
+            var handler = function (value, name, arg) {
+                return (value == "ok" && this == toTestArr && arg == 1);
+            };
+
+            expect($.some(toTestArr, handler, toTestArr, 1)).to.be(true);
+            expect($.some(toTestObj, handler, toTestArr, 1)).to.be(true);
+
+        });
+
+        it("every", function () {
+
+            var toTestArr = [1,2,3,4,5,6,7,8,9,0];
+            var toTestObj = {0:1, 1:2, 2:3, 3:4, 4:5, 5:6, 6:7, 7:8, 8:9, 9:0};
+            var check = toTestArr.slice();
+
+            var handler = function (value, index, arg) {
+                return value == check[index] && this == toTestObj && arg == 1;
+            };
+
+            expect($.every(toTestArr, handler, toTestObj, 1)).to.be(true);
+            expect($.every(toTestObj, handler, toTestObj, 1)).to.be(true);
+
+        });
+
+        it("findFirst", function () {
+
+            var toTestArr = [0, "ok", {}];
+            var toTestObj = {"": 0, "1": "ok", 3: {}};
+
+            var checkArr = {id: 1, value: "ok"};
+            var checkObj = {id: "1", value: "ok"};
+
+            var handler = function (value, name, arg) {
+                return value == "ok" && +name == 1 && arg == 1 && this == toTestArr;
+            };
+
+            var resObj = $.findFirst(toTestObj, handler, toTestArr, 1);
+            var resArr = $.findFirst(toTestArr, handler, toTestArr, 1);
+
+            expect(resObj.id).to.be(checkObj.id);
+            expect(resObj.value).to.be(checkObj.value);
+            expect(resArr.id).to.be(checkArr.id);
+            expect(resArr.value).to.be(checkArr.value);
+
+        });
+
+        it("isPointer", function () {
+
+            var ok = !!window.navigator.msPointerEnabled;
+            expect($.isPointer).to.be(ok);
+
+        });
 
     });
 

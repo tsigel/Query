@@ -14,9 +14,22 @@ module.exports = function(config) {
 
         // list of files / patterns to load in the browser
         files: [
-            //"src/*.js",
-            "build/*.js",
-            "test/query.test.js"
+
+            "test/Browser.js",
+
+            //"src/Query-dom.js",
+            //"src/events/BaseEvent.js",
+            //"src/events/Touch.js",
+            //"src/events/Tap.js",
+            //"src/events/Move.js",
+            //"src/events/MultiTouch.js",
+            //"src/events/Swipe.js",
+            //"src/Query-events.js",
+
+            "build/Query.min.js",
+            //"build/Query.js",
+            "test/query-dom.test.js",
+            "test/query-events.test.js"
         ],
 
 
