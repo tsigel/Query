@@ -65,3 +65,27 @@ gulp.task("make", function () {
 });
 
 gulp.task("default", ["remove", "make", "min"]);
+
+gulp.task("amd-min-all", function () {
+
+    setTimeout(function () {
+        var pre = "define([],function(){";
+        pre = pre + fs.readFileSync("build/Query.min.js", "utf8");
+        pre = pre + "return $});";
+        fs.writeFileSync("build/Query-amd.min.js", pre);
+    }, 10000);
+
+});
+
+gulp.task("amd-all", function () {
+
+    setTimeout(function () {
+        var pre = "define([],function(){\n";
+        pre = pre + fs.readFileSync("build/Query.js", "utf8");
+        pre = pre + "\nreturn $});";
+        fs.writeFileSync("build/Query-amd.js", pre);
+    }, 10000);
+
+});
+
+gulp.task("amd", ["amd-min-all", "amd-all"]);
