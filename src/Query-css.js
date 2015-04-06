@@ -4,15 +4,6 @@
 
         ///IMPORT:src/Matrix.js
 
-        $.floor = function (num) {
-            return (num + 0.5) << 0;
-        };
-
-        $.roundTo = function (num, count) {
-            var d = Math.pow(10, count);
-            return $.floor(num * d) / d;
-        };
-
         var pr = "prototype", ep = E[pr], p = $[pr], A = Array, r = 180 / Math.PI,
             Matrix = window["MSCSSMatrix"] || window["WebKitCSSMatrix"] || CSSMatrix;
 

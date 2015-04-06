@@ -271,6 +271,7 @@ describe("query dom", function () {
         style.innerHTML = ".height {height: 100px}";
         document.head.appendChild(style);
         setTimeout(function () {
+            console.log($div.height());
             expect($div.height()).to.be(100);
             done();
             div.remove();

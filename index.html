@@ -3,16 +3,21 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title></title>
-    <script src="src/Query-dom.js"></script>
-    <script src="src/events/BaseEvent.js"></script>
-    <script src="src/events/Touch.js"></script>
-    <script src="src/events/Move.js"></script>
-    <script src="src/events/Tap.js"></script>
-    <script src="src/events/Swipe.js"></script>
-    <script src="src/events/MultiTouch.js"></script>
-    <script src="src/Query-events.js"></script>
-    <script src="src/Matrix.js"></script>
-    <script src="src/Query-css.js"></script>
+    <!--<script src="src/Query-dom.js"></script>-->
+    <!--<script src="src/events/BaseEvent.js"></script>-->
+    <!--<script src="src/events/Touch.js"></script>-->
+    <!--<script src="src/events/Move.js"></script>-->
+    <!--<script src="src/events/Tap.js"></script>-->
+    <!--<script src="src/events/Swipe.js"></script>-->
+    <!--<script src="src/events/MultiTouch.js"></script>-->
+    <!--<script src="src/Animations/TimeFuncs.js"></script>-->
+    <!--<script src="src/Query-animation.js"></script>-->
+    <!--<script src="src/Query-events.js"></script>-->
+    <!--<script src="src/Matrix.js"></script>-->
+    <!--<script src="src/Query-css.js"></script>-->
+
+    <script src="build/Query.min.js"></script>
+
     <meta name="viewport"
           content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width, height=device-height, target-densitydpi=device-dpi"/>
     <meta name="format-detection" content="telephone=no">
@@ -37,11 +42,24 @@
             height: 100px;
             background-color: red;
         }
+
+        .loop {
+            background-image: url(http://habrastorage.org/storage/3ed46133/9fc51ac1/3f98d3f4/8ded82ca.png);
+            background-position: center center;
+            width: 400px;
+            height: 400px;
+            border-radius: 200px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin: -200px 0 0 -200px;
+        }
     </style>
 </head>
 <body>
 
 <div class="test" style=""></div>
+<div class="loop"></div>
 
 <script>
 
@@ -82,18 +100,108 @@
                 this.css("transform", "rotate(" + (start.angle) + "deg) scale(" + (start.scale) + ")");
             })
             .on("User:touch:end", function () {
-                this.css({
-                    "left": 0,
-                    "top": 0
-                });
-                start = {
-                    angle: 0,
-                    scale: 1,
-                    x: 0,
-                    y: 0
-                };
-                this.css("transform", "rotate(" + (start.angle) + "deg) scale(" + (start.scale) + ")");
+
             });
+
+
+    $.animate({
+        start: {
+            left: 0,
+            top: 0
+        },
+        end: {
+            left: 500,
+            top: 500
+        },
+        exists: {
+            left: "px",
+            top: "px"
+        },
+        loop: 3,
+        yoyo: true,
+        duration: 600,
+        timeFunction: "linear",
+        timeFunctions: {
+            top: $.timeFunctions.bounceInOut
+        },
+        success: function () {
+            console.log(1);
+        },
+        apply: function (result) {
+            test.css(result);
+        }
+    })
+            .delay(1000)
+            .animate({
+                start: {
+                    left: "500px"
+                },
+                end: {
+                    left: "0px"
+                },
+                timeFunction: $.timeFunctions.bounceInOut,
+                success: function () {
+                    console.log(2);
+                },
+                apply: function (result) {
+                    test.css(result);
+                },
+                duration: 1000
+            })
+            .animate({
+                start: {
+                    left: "0px",
+                    top: "500px"
+                },
+                end: {
+                    left: "500px",
+                    top: "250px"
+                },
+                timeFunctions: {
+                    left: $.timeFunctions.sineInOut
+                },
+                apply: function (result) {
+                    test.css(result);
+                }
+            })
+            .animate({
+                start: {
+                    left: "500px",
+                    top: "250px"
+                },
+                end: {
+                    left: "0px",
+                    top: "0px"
+                },
+                timeFunctions: {
+                    left: $.timeFunctions.sineInOut
+                },
+                apply: function (result) {
+                    test.css(result);
+                }
+            })
+            .revers()
+            .onEnd(function (AM) {
+                AM.play();
+            });
+
+    var loop = $(".loop");
+    $.animate({
+        timeFunction: $.timeFunctions.bounceInOut,
+        start: {
+            rotate: "0"
+        },
+        end: {
+            rotate: "10000"
+        },
+        loop: -1,
+        yoyo: true,
+        duration: 55600,
+        apply: function (data) {
+            loop.rotate(data.rotate);
+        }
+    });
+
 
 </script>
 

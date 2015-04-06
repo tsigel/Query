@@ -28,6 +28,7 @@ module.exports = function(config) {
 
             "build/Query.min.js",
             //"build/Query.js",
+
             "test/query-dom.test.js",
             "test/query-events.test.js"
         ],

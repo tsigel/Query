@@ -123,31 +123,15 @@ var $ = (function (W, D) {
         this._node.removeAttribute(name);
     };
 
-    /**
-     * Добавляем/получаем ширину
-     * @param {string|number} [width]
-     * @returns {number}
-     */
-    ep.width = function (width) {
-        if (E._hasVal(width)) {
-            this._setCss("width", typeof width == "number" ? width + "px" : width);
-        } else {
-            return this._node.clientWidth || parseInt(this._getCss("width")) || 0;
+    ["width", "height"].forEach(function (method) {
+        ep[method] = function (param) {
+            if (E._hasVal(param)) {
+                this._setCss(method, typeof param == "number" ? param + "px" : param);
+            } else {
+                return this._node[$.camelCase("client " + method)] || parseInt(this._getCss(method)) || 0;
+            }
         }
-    };
-
-    /**
-     * Добавляем/получаем высоту
-     * @param {string|number} [height]
-     * @returns {number}
-     */
-    ep.height = function (height) {
-        if (E._hasVal(height)) {
-            this._setCss("height", typeof height == "number" ? height + "px" : height);
-        } else {
-            return this._node.clientHeight || parseInt(this._getCss("height")) || 0;
-        }
-    };
+    });
 
     /**
      * Добавляем/получаем содержимое элемента
@@ -401,11 +385,11 @@ var $ = (function (W, D) {
      */
     p.toggleDisplay = function () {
         if (!this._has()) return this;
-        this.each(function () {
-            if (this.css("display") == "none") {
-                this.show();
+        this.each(function (elem) {
+            if (elem.css("display") == "none") {
+                elem.show();
             } else {
-                this.hide();
+                elem.hide();
             }
         });
     };
@@ -417,7 +401,7 @@ var $ = (function (W, D) {
      */
     p.each = function (callback) {
         this.forEach(function (el, index) {
-            callback.call(this.eq(index), el._node, index);
+            callback(this.eq(index), el._node, index);
         }, this);
         return this;
     };
@@ -718,6 +702,15 @@ var $ = (function (W, D) {
         });
 
         return result;
+    };
+
+    $.floor = function (num) {
+        return (num + 0.5) << 0;
+    };
+
+    $.roundTo = function (num, count) {
+        var d = Math.pow(10, count);
+        return $.floor(num * d) / d;
     };
 
     $.addPlugin = function (callback) {
