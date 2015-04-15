@@ -14,6 +14,7 @@
         };
 
         AC[pr].delay = function (time) {
+            var that = this;
             this.animations.push({
                 start: function () {
                     setTimeout(function () {
@@ -21,7 +22,11 @@
                     }, time);
                 }
             });
-            var that = this;
+            if (this.animations.length == 1) {
+                requestAnimationFrame(function () {
+                    that.animations[0].start(true);
+                });
+            }
             return this;
         };
 
@@ -45,7 +50,8 @@
                 if (that.active in that.animations) {
                     that.animations[that.active].start(that.step > 0);
                 } else {
-                    that.success(that);
+                    if (that.success)
+                        that.success(that);
                 }
             });
         };
@@ -159,7 +165,7 @@
                 if (!options.timeFunctions) options.timeFunctions = {};
 
                 $.forEach(options.start, function (value, name) {
-                    exists[name] = options.exists[name] || value.replace(reg, "") || options.end[name].replace(reg, "");
+                    exists[name] = options.exists[name] || (value + "").replace(reg, "") || (options.end[name] + "").replace(reg, "");
                     start[name] = parseFloat(value);
                     end[name] = parseFloat(options.end[name]);
                     delta[name] = end[name] - start[name];
