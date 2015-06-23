@@ -155,7 +155,7 @@ var $ = (function (W, D) {
     ep._setCss = function (name, value) {
         var $name;
         name = $.camelCase(name);
-        if (!name in E.test.style) {
+        if (!(name in E.test.style)) {
             if (!E._activePrefix) {
                 if (!E._prefexes.some(function (prefix) {
                         var $name = $.camelCase(prefix + name);

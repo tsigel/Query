@@ -10,6 +10,6 @@
     "karma-expect": "^1.1.0",
     "karma-mocha": "^0.1.10",
     "mocha": "^2.2.1",
-    "ts-fs-promise": "0.0.9"
+    "fs-extra": "*"
   }
 }
