@@ -14,6 +14,17 @@ var $ = (function (W, D) {
      * @constructor
      */
     var E = function (node) {
+        /**
+         * Объект для хранения временных данных
+         * @type {{}}
+         * @private
+         */
+        this._state = {};
+        /**
+         * элемент
+         * @type {HTMLElement|HTMLInputElement}
+         * @private
+         */
         this._node = node;
     };
 
@@ -65,7 +76,7 @@ var $ = (function (W, D) {
      * Добавляем/получаем стили элемента
      * @param {string|Object} name
      * @param [value]
-     * @returns {string|null}
+     * @returns {string|*}
      */
     ep.css = function (name, value) {
         if (typeof name == "object") {
@@ -82,15 +93,52 @@ var $ = (function (W, D) {
     };
 
     /**
+     * Скрываем элемент
+     * @returns {ep}
+     */
+    ep.hide = function () {
+        var display = this.css('display');
+        if (display != 'none') {
+            this._state.display = display;
+            this.css('display', 'none');
+        }
+        return this;
+    };
+
+    /**
+     * Показываем элемент
+     * @returns {ep}
+     */
+    ep.show = function () {
+        var display = this.css('display');
+        if (display === 'none') {
+            this.css('display', this._state.display || 'block');
+        }
+        return this;
+    };
+
+    /**
+     * Скрываем или показываем элемент
+     * @param {boolean} state
+     * @returns {ep}
+     */
+    ep.toggleDisplay = function (state) {
+        if (!E._hasVal(state)) {
+            state = (this.css('display') == 'none');
+        }
+        return (state ? this.show() : this.hide());
+    };
+
+    /**
      * Добавляем/убираем класс
      * @param {string} className
+     * @param {boolean} [state]
      */
-    ep.toggleClass = function (className) {
-        if (this.hasClass(className)) {
-            this.removeClass(className);
-        } else {
-            this.addClass(className);
+    ep.toggleClass = function (className, state) {
+        if (!E._hasVal(state)) {
+            state = !this.hasClass(className);
         }
+        return (state ? this.addClass(className) : this.removeClass(className));
     };
 
     /**
@@ -144,6 +192,17 @@ var $ = (function (W, D) {
         } else {
             return this._node.innerHTML;
         }
+    };
+
+    ep.remove = function () {
+        this._remove();
+        if (this._node.parentNode) {
+            this._node.parentNode.removeChild(this._node);
+        }
+    };
+
+    ep._remove = function () {
+
     };
 
     /**
@@ -279,7 +338,7 @@ var $ = (function (W, D) {
     $[pr][c] = $;
     var p = $.prototype;
 
-    ["addClass", "removeClass", "toggleClass", "removeAttr"].forEach(function (method) {
+    ["addClass", "removeClass", "toggleClass", "removeAttr", "show", "hide", "toggleDisplay"].forEach(function (method) {
         p[method] = function (className) {
             this._toAll(method, [className]);
             return this;
@@ -344,24 +403,6 @@ var $ = (function (W, D) {
     };
 
     /**
-     * Показываем все элементы коллекции
-     * @returns {$}
-     */
-    p.show = function () {
-        if (!this._has()) return this;
-        this._toAll("css", ["display", "block"]);
-    };
-
-    /**
-     * Скрываем все элементы коллекции
-     * @returns {$}
-     */
-    p.hide = function () {
-        if (!this._has()) return this;
-        this._toAll("css", ["display", "none"]);
-    };
-
-    /**
      * Применяем стили всем элементам коллекции или получаем стиль первого
      * @param {string|Object} name
      * @param {string} [value]
@@ -377,21 +418,6 @@ var $ = (function (W, D) {
                 return this[0].css(name);
             }
         }
-    };
-
-    /**
-     * Скрывает или показывает все элементы коллекции
-     * @returns {$}
-     */
-    p.toggleDisplay = function () {
-        if (!this._has()) return this;
-        this.each(function (elem) {
-            if (elem.css("display") == "none") {
-                elem.show();
-            } else {
-                elem.hide();
-            }
-        });
     };
 
     /**
@@ -719,8 +745,15 @@ var $ = (function (W, D) {
 
     $.events = {};
 
+    /**
+     * Проверяем если винда с mcPointer
+     * @type {boolean}
+     */
     $.isPointer = false;
 
+    /**
+     * @returns {string}
+     */
     function s4() {
         return Math.floor((1 + Math.random()) * 0x10000)
             .toString(16)

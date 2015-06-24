@@ -138,6 +138,14 @@
         };
 
         /**
+         * Не забываем снять все обрботчики с убиваемого элемента
+         * @private
+         */
+        ep._remove = function () {
+            this.off();
+        };
+
+        /**
          * Запускаем событие (для trigger)
          * @param {string} event
          * @param {Array} localArgs

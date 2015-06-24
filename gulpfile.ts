@@ -1,20 +1,25 @@
 /// <reference path="./type/gulp.d.ts" />
 /// <reference path="./type/gulp-uglify.d.ts" />
-/// <reference path="./node_modules/ts-fs-promise/types/fs-extra.d.ts" />
+/// <reference path="./type/fs-extra.d.ts" />
 
 import gulp = require("gulp");
 import uglify = require("gulp-uglify");
 import rename = require("gulp-rename");
 import fs = require("fs-extra");
 import concat = require("gulp-concat");
+import Make = require('./tasks/Make');
 
-gulp.task("remove", function () {
-    fs.removeSync("./build");
+gulp.task("default", ["min"]);
+
+gulp.task("remove", function (callback) {
+    fs.remove("./build", () => {
+        callback();
+    });
 });
 
-gulp.task("min", function () {
+gulp.task("min", ['make'], function () {
 
-    gulp.src("build/*.js")
+    return gulp.src("build/*.js")
         .pipe(uglify())
         .pipe(rename(function (path) {
             path.extname = ".min.js"
@@ -23,69 +28,35 @@ gulp.task("min", function () {
 
 });
 
-gulp.task("make", function () {
+gulp.task("make", ['remove'], function (callback) {
 
-    var concat = function (fileName, paths) {
-        paths.unshift("build/Query-dom.js");
-        var get = function () {
-            return paths.map(function (name) {
-                return fs.readFileSync(name, "utf8");
-            }).join("\n")
-        };
-        fs.writeFileSync(fileName, get());
-    };
-
-    fs.mkdirSync("build");
-    fs.copySync("src/Query-dom.js", "build/Query-dom.js");
-    fs.copySync("src/Query-events.js", "build/Query-events.js");
-    fs.copySync("src/Query-css.js", "build/Query-css.js");
-    fs.copySync("src/Query-animation.js", "build/Query-animation.js");
-
-    fs.writeFileSync("build/Query-events.js", fs.readFileSync("build/Query-events.js", "utf8")
-        .replace(/\/\/\/IMPORT:src\/events\/(.+)/g, function (match, group) {
-            var text = fs.readFileSync("src/events/" + group, "utf8");
-            text = text.substr(text.indexOf("///---") + 6);
-            return text.replace(/\n/g, "\n      ").replace("--", "");
-        }));
-
-    fs.writeFileSync("build/Query-css.js", fs.readFileSync("build/Query-css.js", "utf8")
-        .replace(/\/\/\/IMPORT:src\/(.+)/g, function (match, group) {
-            return fs.readFileSync("src/" + group, "utf8").replace(/\n/g, "\n      ");
-        }));
-
-    fs.writeFileSync("build/Query-animation.js", fs.readFileSync("build/Query-animation.js", "utf8")
-        .replace(/\/\/\/IMPORT:src\/(.+)/g, function (match, group) {
-            return fs.readFileSync("src/" + group, "utf8").replace(/\n/g, "\n      ");
-        }));
-
-    concat("build/Query.js", ["build/Query-events.js", "build/Query-animation.js", "build/Query-css.js"]);
-    concat("build/Query-events.js", ["build/Query-events.js"]);
-    concat("build/Query-css.js", ["build/Query-css.js"]);
-    concat("build/Query-animation.js", ["build/Query-animation.js"]);
-});
-
-gulp.task("default", ["remove", "make", "min"]);
-
-gulp.task("amd-min-all", function () {
-
-    setTimeout(function () {
-        var pre = "define([],function(){";
-        pre = pre + fs.readFileSync("build/Query.min.js", "utf8");
-        pre = pre + "return $});";
-        fs.writeFileSync("build/Query-amd.min.js", pre);
-    }, 10000);
+    Make.build(['dom', 'events', 'css', 'animation'], () => {
+        console.log('success');
+        callback();
+    });
 
 });
 
-gulp.task("amd-all", function () {
-
-    setTimeout(function () {
-        var pre = "define([],function(){\n";
-        pre = pre + fs.readFileSync("build/Query.js", "utf8");
-        pre = pre + "\nreturn $});";
-        fs.writeFileSync("build/Query-amd.js", pre);
-    }, 10000);
-
-});
-
-gulp.task("amd", ["amd-min-all", "amd-all"]);
+//gulp.task("amd-min-all", function () {
+//
+//    setTimeout(function () {
+//        var pre = "define([],function(){";
+//        pre = pre + fs.readFileSync("build/Query.min.js", "utf8");
+//        pre = pre + "return $});";
+//        fs.writeFileSync("build/Query-amd.min.js", pre);
+//    }, 10000);
+//
+//});
+//
+//gulp.task("amd-all", function () {
+//
+//    setTimeout(function () {
+//        var pre = "define([],function(){\n";
+//        pre = pre + fs.readFileSync("build/Query.js", "utf8");
+//        pre = pre + "\nreturn $});";
+//        fs.writeFileSync("build/Query-amd.js", pre);
+//    }, 10000);
+//
+//});
+//
+//gulp.task("amd", ["amd-min-all", "amd-all"]);
