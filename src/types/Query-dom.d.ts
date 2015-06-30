@@ -3,7 +3,7 @@ interface IFind {
     value: any;
 }
 
-interface QueryStatic {
+interface QueryStaticDom {
 
     (param:string):QueryDom;
     (param:Array<string>):QueryDom;
@@ -89,7 +89,7 @@ interface QueryStatic {
     floor(num:number):number;
     roundTo(num:number, toFix:number):number;
 
-    addPlugin(callback:($:QueryStatic, E)=>void):void;
+    addPlugin(callback:($:QueryStaticDom, E)=>void):void;
 
     events: {
         start: string;

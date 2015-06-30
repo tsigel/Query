@@ -1,6 +1,6 @@
 /// <reference path="Query-dom.d.ts" />
 
-interface QueryStaticAnimation extends QueryStatic {
+interface QueryStaticAnimation {
     animate(options:IAnimationOptions):IAnimation;
     delay(time:number):IAnimation;
 }
