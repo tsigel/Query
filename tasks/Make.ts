@@ -8,7 +8,7 @@ var Promise = PromiseModule.Promise;
 
 class Make {
 
-    private path:string = path.join('..');
+    private path:string = path.join('./');
 
     private tasks = ['dom', 'events', 'css', 'animation'];
 
@@ -46,8 +46,6 @@ class Make {
 
         this.dom().then(() => {
 
-            console.log('dom');
-
             Make.read(path.join(this.paths.build, this.paths.dom.name)).then((domSource:string) => {
                 return Promise.all(tasks.map((task:string) => {
                     return this.make(this.paths[task].path);
@@ -77,12 +75,14 @@ class Make {
 
         return Make.read(filePath).then((fileText:string) => {
 
-            var files = (filePath.match(/\/\/\/IMPORT:(.+)/g) || []).map((localPath) => {
-                return Make.read(path.join(this.path, localPath))
+            var files = (fileText.match(/\/\/\/IMPORT:(.+)/g) || []).map((localPath) => {
+                return Make.read(path.join(this.path, localPath.replace('///IMPORT:', '')));
             });
 
-            return Promise.all(files).then((filestexts:Array<string>) => {
-                fileText.replace(/\/\/\/IMPORT:(.+)/, filestexts.shift());
+            return Promise.all(files).then((filesTexts:Array<string>) => {
+                filesTexts.forEach((text) => {
+                    fileText = fileText.replace(/\/\/\/IMPORT:(.+)/, text);
+                });
                 return fileText;
             });
 
@@ -98,6 +98,7 @@ class Make {
         return new Promise((resolve, reject) => {
             fs.copy(from, to, (err) => {
                 if (err) {
+                    console.error(err.toString());
                     reject(err);
                 } else {
                     resolve();
@@ -110,6 +111,7 @@ class Make {
         return new Promise((resolve, reject) => {
             fs.readFile(path, 'utf-8', function (err, text:string) {
                 if (err) {
+                    console.error(err.toString());
                     reject(err);
                 } else {
                     resolve(text);
@@ -122,6 +124,7 @@ class Make {
         return new Promise((resolve, reject) => {
             fs.writeFile(path, data, 'utf-8', (err) => {
                 if (err) {
+                    console.error(err.toString());
                     reject(err);
                 } else {
                     resolve();

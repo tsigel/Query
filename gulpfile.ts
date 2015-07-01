@@ -31,7 +31,6 @@ gulp.task("min", ['make'], function () {
 gulp.task("make", ['remove'], function (callback) {
 
     Make.build(['dom', 'events', 'css', 'animation'], () => {
-        console.log('success');
         callback();
     });
 

@@ -1,5 +1,5 @@
 {
-  "name": "Query-gitHub",
+  "name": "ts-query",
   "version": "0.0.1",
   "devDependencies": {
     "gulp": "^3.8.11",

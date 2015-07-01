@@ -26,7 +26,7 @@ module.exports = function(config) {
             //"src/events/Swipe.js",
             //"src/Query-events.js",
 
-            "build/Query.min.js",
+            "build/query.js",
             //"build/Query.js",
 
             "test/query-dom.test.js",
