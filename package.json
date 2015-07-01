@@ -1,6 +1,6 @@
 {
   "name": "ts-query",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "devDependencies": {
     "gulp": "^3.8.11",
     "gulp-concat": "^2.5.2",
