@@ -1,4 +1,4 @@
-var pr = "prototype", p = $[pr], A = Array, ID = "__ID__", D = document;
+var pr = "prototype", p = $[pr], A = Array, ID = "__ID__", D = window['$document'] || document;
 
 var extend = function (child, parent) {
     var P = function () {};

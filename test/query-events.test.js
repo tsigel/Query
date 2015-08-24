@@ -133,8 +133,7 @@ describe("query events", function () {
 
         var div = Browser.createElement("div");
 
-        $(div)
-            .on("User:swipe:horizontal:right", function () {
+        $(div).on("User:swipe:horizontal:right", function () {
                 horizontal = true;
             });
 
