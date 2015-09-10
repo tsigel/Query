@@ -149,7 +149,7 @@ module Browser {
         public timeStamp:number = null;
         public pageX:number = null;
         public pageY:number = null;
-        public target:HTMLElement = null;
+        public target:IElement = null;
         public touches:ITouches = null;
         public changedTouches:ITouches = null;
 

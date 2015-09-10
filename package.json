@@ -1,6 +1,12 @@
 {
   "name": "ts-query",
   "version": "0.0.3",
+  "scripts": {
+    "init": "npm install && npm run compileGulp && gulp && npm run test",
+    "compileGulp": "tsc gulpfile.ts --m commonjs",
+    "compileTest": "tsc ./test/Browser.ts --m commonjs",
+    "test": "npm run compileTest && karma start test/karma.conf"
+  },
   "devDependencies": {
     "gulp": "^3.8.11",
     "gulp-concat": "^2.5.2",
