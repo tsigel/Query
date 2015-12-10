@@ -209,12 +209,14 @@
                 if (!E._fingers.length) {
                     D.removeEventListener($.events.move, move);
                     D.removeEventListener($.events.end, end);
+                    $this.__hasEvents = false;
                 }
             };
 
-            if (E._fingers.length == 1) {
+            if (!this.__hasEvents) {
                 D.addEventListener($.events.move, move, false);
                 D.addEventListener($.events.end, end, false);
+                this.__hasEvents = true;
             }
 
         };

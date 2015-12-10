@@ -271,7 +271,6 @@ describe("query dom", function () {
         style.innerHTML = ".height {height: 100px}";
         document.head.appendChild(style);
         setTimeout(function () {
-            console.log($div.height());
             expect($div.height()).to.be(100);
             done();
             div.remove();
@@ -298,7 +297,9 @@ describe("query dom", function () {
         it("add", function () {
 
             el.addClass("test2");
+            el.addClass("test2");
             expect(div.className.indexOf("test2") != -1).to.be(true);
+            expect(div.className.indexOf("test2") === div.className.lastIndexOf("test2")).to.be(true);
             div.className = "test";
 
         });

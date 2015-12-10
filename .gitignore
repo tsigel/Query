@@ -1,5 +1,6 @@
 .idea
-/node_modules
-/build
-/test/Browser.js
-/tasks/**.js
+node_modules
+build
+test/Browser.js
+tasks/**.js
+gulpfile.js

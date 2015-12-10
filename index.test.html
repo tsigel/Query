@@ -26,8 +26,8 @@
             position: absolute;
             left: 0;
             top: 0;
-            width: 100px;
-            height: 100px;
+            width: 200px;
+            height: 200px;
             background-color: red;
         }
 
@@ -46,8 +46,8 @@
 </head>
 <body>
 
-<div class="test" style=""></div>
 <div class="loop"></div>
+<div class="test" style=""></div>
 
 <script>
 
@@ -92,103 +92,103 @@
             });
 
 
-    $.animate({
-        start: {
-            left: 0,
-            top: 0
-        },
-        end: {
-            left: 500,
-            top: 500
-        },
-        exists: {
-            left: "px",
-            top: "px"
-        },
-        loop: 3,
-        yoyo: true,
-        duration: 600,
-        timeFunction: "linear",
-        timeFunctions: {
-            top: $.timeFunctions.bounceInOut
-        },
-        success: function () {
-            console.log(1);
-        },
-        apply: function (result) {
-            test.css(result);
-        }
-    })
-            .delay(1000)
-            .animate({
-                start: {
-                    left: "500px"
-                },
-                end: {
-                    left: "0px"
-                },
-                timeFunction: $.timeFunctions.bounceInOut,
-                success: function () {
-                    console.log(2);
-                },
-                apply: function (result) {
-                    test.css(result);
-                },
-                duration: 1000
-            })
-            .animate({
-                start: {
-                    left: "0px",
-                    top: "500px"
-                },
-                end: {
-                    left: "500px",
-                    top: "250px"
-                },
-                timeFunctions: {
-                    left: $.timeFunctions.sineInOut
-                },
-                apply: function (result) {
-                    test.css(result);
-                }
-            })
-            .animate({
-                start: {
-                    left: "500px",
-                    top: "250px"
-                },
-                end: {
-                    left: "0px",
-                    top: "0px"
-                },
-                timeFunctions: {
-                    left: $.timeFunctions.sineInOut
-                },
-                apply: function (result) {
-                    test.css(result);
-                }
-            })
-            .revers()
-            .onEnd(function (AM) {
-//                AM.play();
-            });
+//    $.animate({
+//        start: {
+//            left: 0,
+//            top: 0
+//        },
+//        end: {
+//            left: 500,
+//            top: 500
+//        },
+//        exists: {
+//            left: "px",
+//            top: "px"
+//        },
+//        loop: 3,
+//        yoyo: true,
+//        duration: 600,
+//        timeFunction: "linear",
+//        timeFunctions: {
+//            top: $.timeFunctions.bounceInOut
+//        },
+//        success: function () {
+//            console.log(1);
+//        },
+//        apply: function (result) {
+//            test.css(result);
+//        }
+//    })
+//            .delay(1000)
+//            .animate({
+//                start: {
+//                    left: "500px"
+//                },
+//                end: {
+//                    left: "0px"
+//                },
+//                timeFunction: $.timeFunctions.bounceInOut,
+//                success: function () {
+//                    console.log(2);
+//                },
+//                apply: function (result) {
+//                    test.css(result);
+//                },
+//                duration: 1000
+//            })
+//            .animate({
+//                start: {
+//                    left: "0px",
+//                    top: "500px"
+//                },
+//                end: {
+//                    left: "500px",
+//                    top: "250px"
+//                },
+//                timeFunctions: {
+//                    left: $.timeFunctions.sineInOut
+//                },
+//                apply: function (result) {
+//                    test.css(result);
+//                }
+//            })
+//            .animate({
+//                start: {
+//                    left: "500px",
+//                    top: "250px"
+//                },
+//                end: {
+//                    left: "0px",
+//                    top: "0px"
+//                },
+//                timeFunctions: {
+//                    left: $.timeFunctions.sineInOut
+//                },
+//                apply: function (result) {
+//                    test.css(result);
+//                }
+//            })
+//            .revers()
+//            .onEnd(function (AM) {
+////                AM.play();
+//            });
 
     var loop = $(".loop");
-    $.animate({
-        timeFunction: $.timeFunctions.bounceInOut,
-        start: {
-            rotate: "0"
-        },
-        end: {
-            rotate: "10000"
-        },
-        loop: -1,
-        yoyo: true,
-        duration: 55600,
-        apply: function (data) {
-            loop.rotate(data.rotate);
-        }
-    });
+//    $.animate({
+//        timeFunction: $.timeFunctions.bounceInOut,
+//        start: {
+//            rotate: "0"
+//        },
+//        end: {
+//            rotate: "10000"
+//        },
+//        loop: -1,
+//        yoyo: true,
+//        duration: 55600,
+//        apply: function (data) {
+//            loop.rotate(data.rotate);
+//        }
+//    });
 
 
 </script>
