@@ -1,6 +1,6 @@
 {
   "name": "ts-query",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "scripts": {
     "init": "npm install && npm run compileGulp && gulp && npm run test",
     "compileGulp": "tsc gulpfile.ts --m commonjs",
@@ -18,5 +18,27 @@
     "mocha": "^2.2.1",
     "fs-extra": "*",
     "es6-promise": "*"
-  }
+  },
+  "main": "query.min.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tsigel/Query.git"
+  },
+  "homepage": "https://github.com/tsigel/Query#readme",
+  "author": "Tsigel",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tsigel/Query/issues"
+  },
+  "keywords": [
+    "typescript",
+    "typed",
+    "events",
+    "event",
+    "DOM",
+    "Dom manipulation",
+    "base class",
+    "extend",
+    "backbone events"
+  ]
 }
