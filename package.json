@@ -1,6 +1,6 @@
 {
   "name": "ts-query",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "scripts": {
     "init": "npm install && npm run compileGulp && gulp && npm run test",
     "compileGulp": "tsc gulpfile.ts --m commonjs",
