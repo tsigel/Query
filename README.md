@@ -4,6 +4,39 @@ its simple library for dom control.
 
 # API
 
+#### addClass(className: string)
+#### removeClass(className: string)
+#### toggleClass(className: string)
+#### removeAttr(name)
+#### show()
+#### hide()
+#### toggleDisplay() // switch display none/block
+#### val(): string
+#### val(value: string)
+#### html(): string
+#### html(html: string)
+#### width(): number // width of first element collection
+#### width(width: number) // set width for all elements collection
+#### height(): number // height of first element collection
+#### height(height: number) // set height for all elements collection
+#### attr(name: string): string //value of first element collection
+#### attr(name: string, value: string)
+#### add(element: Array<string|Element|$>|string|Element|$)
+#### hasClass(className: string): boolean // of first element collection
+#### find(selector: string): $
+#### clone(): $
+#### css(name: string): string
+#### css(name: string, value: string)
+#### css(style: {[key: string]: string});
+#### each(callback: ($elem: $, elem: HTMLElement, index: number))
+#### children(): $
+#### eq(index: number): $
+#### get(index: number): HTMLElement
+#### parent(): $
+#### append(element: Array<string|Element|$>|string|Element|$): $
+#### prepend(element: Array<string|Element|$>|string|Element|$): $
+
+
 ## Static
 
 #### isPointer: boolean (is windows with pointer events)
@@ -56,3 +89,11 @@ $.findFirst([{id: 1}, {id: 2}, {id: 3}], function (item) {
 #### $.trim(some: string) 
 #### $.randomInt(min: number, max: number): number
 #### $.random(min: number, max: number): number
+#### $.parse(html: string): Array<HTMLElement>
+
+example
+
+```
+$.parse('<div><span></span></div></div>') // [element: HTMLDivElement, element: HTMLSpanElement];
+```
+
